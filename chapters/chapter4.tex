@@ -1,0 +1,235 @@
+\chapter{Численные эксперементы}\label{chap4}
+
+В этой главе применим схемы MPC из глав \ref{chap2} и \ref{chap3} и приведём результаты, полученные программными реализациями алгортимов \ref{Alg1} и \ref{Alg2}.
+
+\section{Пример}
+Рассмотрим пример, который описывает систему из 4 сообщающихся резервуаров \cite{Berberich}. Это хорошо изученная в теории управления и в частности в теории МРС система. Она описывает достаточно медленный и устойчивый динамический процесс. Однако, известно также, что при выборе короткого горизонта управления система может стать неустойчивой. Линеаризованная динамика системы в дискретном времени описывается уравнениями
+
+\begin{displaymath}
+	x_{k+1}=\begin{bmatrix}
+		0.921 && 0 && 0.041 && 0 \\
+		0 && 0.918 && 0 && 0.033 \\
+		0 && 0 && 0.924 && 0 \\
+		0 && 0 && 0 && 0.937
+	\end{bmatrix}x_k+
+	\begin{bmatrix}
+		0.017 && 0.001 \\
+		0.001 && 0.023 \\
+		0 && 0.061 \\
+		0.072 && 0
+	\end{bmatrix}u_k,
+\end{displaymath}
+\begin{displaymath}
+	y_k=\begin{bmatrix}
+		1 && 0 && 0 && 0\\
+		0 && 1 && 0 && 0
+	\end{bmatrix}x_k.
+\end{displaymath}
+
+Целью управления будет являться отслеживание заданного значения системы 
+\begin{displaymath}
+	(u^s,y^s)=\left(
+		\begin{bmatrix}
+			1 \\ 1
+		\end{bmatrix},	
+		\begin{bmatrix}
+		   0.65 \\ 0.77
+		\end{bmatrix}		
+	\right).
+\end{displaymath}
+%ASK
+Предположим, что системные матрицы неизвестны, но доступна одна траектория входа-выхода $\{u^d_k,y^d_k\}^{N-1}_{k=0}$ длины $N = 400$, которая генерируется путем равномерной выборки $u^d_k$ из $[-1,1]^2$.
+Горизонт прогнозирования установим в $L = 30$, и следующие параметры $Q = 3 \cdot E_2$, $R = 10^{-4} \cdot E_2, \lambda_\sigma = 1000, \lambda_\alpha\overline{\varepsilon}=0.1$.
+
+\section{Программная реализация алгоритмов}
+Рассмотрим способ реализации алгоритмов (\ref{Alg1}-\ref{Alg2}) на языке Matlab.
+Сперва зададим матрицу и вектор ограничений-равенств для quadprog.
+
+Для алгоритма (\ref{Alg1}):
+\begin{lstlisting}
+for i = 1:4:(L + n) * 4
+    Aeq(i, i) = 1;
+    Aeq(i + 1, i + 1) = 1;
+    Aeq(i + 2, i + 2) = 1;
+    Aeq(i + 3, i + 3) = 1;
+    hIndex = fix(i / 4) + 1;
+    Aeq(i, alphaRange) = -uHankel(hIndex, :, 1);
+    Aeq(i + 1, alphaRange) = -uHankel(hIndex, :, 2);
+    Aeq(i + 2, alphaRange) = -yHankel(hIndex, :, 1);
+    Aeq(i + 3, alphaRange) = -yHankel(hIndex, :, 2);
+end
+j = 0;
+for i = (L + n) * 4 + 1:numel(Aeq(:, 1))
+    Aeq(i, steadyFirstIndex + j) = 1;
+    j = j + 1; 
+end
+beq(1, (L + n) * 4 + 1:(L + n) * 4 + (L * 4)) = 1;
+\end{lstlisting}
+Для алгоритма (\ref{Alg2}):
+\begin{lstlisting}
+for i = 1:4:(L + n) * 4
+    Aeq(i, i) = 1;
+    Aeq(i + 1, i + 1) = 1;
+    Aeq(i + 2, i + 2) = 1;
+    Aeq(i + 3, i + 3) = 1;
+    hIndex = fix(i / 4) + 1;
+    Aeq(i, alphaRange) = -uHankel(hIndex, :, 1);
+    Aeq(i + 1, alphaRange) = -uHankel(hIndex, :, 2);
+    Aeq(i + 2, alphaRange) = -yHankel(hIndex, :, 1);
+    Aeq(i + 3, alphaRange) = -yHankel(hIndex, :, 2);
+    
+    Aeq(i + 2, sigmaShift + sigmaIndex) = 1;
+    Aeq(i + 3, sigmaShift + sigmaIndex + 1) = 1;
+    
+    sigmaIndex = sigmaIndex + 2;
+end
+\end{lstlisting}
+
+Сведём задачу к минимизации функции
+\begin{displaymath}
+	\underset{x}\min\, \frac{1}{2}\,x^T H x + f^T,
+\end{displaymath}
+где $H$ и $f$ задаются следующим образом.
+
+Для алгоритма (\ref{Alg1}):
+\begin{lstlisting}
+quadH = zeros(((L + n) * 4)  + (N - (L + n) + 1) + (L * 4));
+quadF = zeros(1, ((L + n) * 4)  + (N - (L + n) + 1) + (L * 4));
+for i = n * 4 + 1:4:(L + n) * 4
+    quadH(i, i) = coeffR;
+    quadH(i + 1, i + 1) = coeffR;
+    quadH(i + 2, i + 2) = coeffQ;
+    quadH(i + 3, i + 3) = coeffQ;
+    for j = steadyFirstIndex:4:numel(quadH(1, :))
+        quadH(i, j) = -2 * uSteady(1) * coeffR;
+        quadH(i + 1, j + 1) = -2 * uSteady(2) * coeffR;
+        quadH(i + 2, j + 2) = -2 * ySteady(1) * coeffQ;
+        quadH(i + 3, j + 3) = -2 * ySteady(2) * coeffQ;
+    end
+end
+squares = L * 4 * ...
+          (coeffR * uSteady(1)^2 + coeffR * uSteady(2)^2 ...
+          + coeffQ * ySteady(1)^2 + coeffQ * ySteady(2)^2);
+quadF(1, steadyFirstIndex) = squares;
+quadH = quadH * 2;
+\end{lstlisting}
+
+Для алгоритма (\ref{Alg2}):
+\begin{lstlisting}
+quadH = zeros(((L + n) * 4)  + (N - (L + n) + 1) + (L * 4) + (L + n) * 2);
+quadF = zeros(1, ((L + n) * 4)  + (N - (L + n) + 1) + (L * 4) + (L + n) * 2);
+for i = alphaShift+1:alphaRange(end)
+    quadH(i,i)=lambdaAlphaEps;
+end
+for i = sigmaShift+1:sigmaRange(end)
+    quadH(i,i)=lambdaSigma;
+end
+for i = n * 4 + 1:4:(L + n) * 4
+    quadH(i, i) = coeffR;
+    quadH(i + 1, i + 1) = coeffR;
+    quadH(i + 2, i + 2) = coeffQ;
+    quadH(i + 3, i + 3) = coeffQ;
+    for j = steadyFirstIndex:4:numel(quadH(1, :))
+        quadH(i, j) = -2 * uSteady(1) * coeffR;
+        quadH(i + 1, j + 1) = -2 * uSteady(2) * coeffR;
+        quadH(i + 2, j + 2) = -2 * ySteady(1) * coeffQ;
+        quadH(i + 3, j + 3) = -2 * ySteady(2) * coeffQ;
+    end
+end
+squares = L * 4 * ...
+          (coeffR * uSteady(1)^2 + coeffR * uSteady(2)^2 ...
+          + coeffQ * ySteady(1)^2 + coeffQ * ySteady(2)^2);
+quadF(1, steadyFirstIndex) = squares;
+quadH = quadH * 2;
+\end{lstlisting}
+
+После начнём итерационный процесс от $0$ до $N$.
+В начале которого будем вычеслять вектор ограничений.
+
+Для алгоритма (\ref{Alg1}):
+\begin{lstlisting}
+    for i = 1:4:L * 4
+        beq(i) = uRes(j, 1);
+        beq(i + 1) = uRes(j, 2);
+        beq(i + 2) = yRes(j, 1);
+        beq(i + 3) = yRes(j, 2);
+        j = j + 1;
+   end
+\end{lstlisting}
+
+Для алгоритма (\ref{Alg2}):
+\begin{lstlisting}
+        Aeq(i + 2, sigmaRange) = 0;
+        Aeq(i + 3, sigmaRange) = 0;
+        
+        beq(i) = uRes(j, 1);
+        beq(i + 1) = uRes(j, 2);
+        beq(i + 2) = yRes(j, 1);
+        beq(i + 3) = yRes(j, 2);
+        j = j + 1;
+\end{lstlisting}
+
+Зададим терминальные ограничения.
+
+Для алгоритма (\ref{Alg1}):
+\begin{lstlisting}
+    for i = L * 4 + 1:4:(L + n) * 4
+        beq(i) = uSteady(1, 1);
+        beq(i + 1) = uSteady(2, 1);
+        beq(i + 2) = ySteady(1, 1);
+        beq(i + 3) = ySteady(2, 1);
+    end
+\end{lstlisting}
+
+Для алгоритма (\ref{Alg2}):
+\begin{lstlisting}
+    for i = L * 4 + 1:4:(L + n) * 4
+        Aeq(i + 2, sigmaRange) = 0;
+        Aeq(i + 3, sigmaRange) = 0;
+        
+        beq(i) = uSteady(1, 1);
+        beq(i + 1) = uSteady(2, 1);
+        beq(i + 2) = ySteady(1, 1);
+        beq(i + 3) = ySteady(2, 1);
+    end
+\end{lstlisting}
+
+Решим задачи (\ref{problem2a} - \ref{problem2d}) и (\ref{problem3a} - \ref{problem3e}) с помощью quadprog.
+\begin{lstlisting}
+    options = optimoptions('quadprog', ...
+                           'MaxIter', 10000, ....
+                           'TolFun', 1e-15, ...
+                           'TolX', 1e-15);
+    [res, value] = quadprog(quadH, quadF, [], [], ...
+                            Aeq, beq, [], [], [], options);    
+\end{lstlisting}
+И запишем результат.
+\begin{lstlisting}
+    j = timeIndex - n;
+    for i = 1:4:(L + n) * 4
+        uRes(j, 1) = res(i);
+        uRes(j, 2) = res(i + 1);
+        [dsResY, dsResX] = dynamicSystemFunc(uRes(j,:)', xRes(j,:)', A, B, C);
+         yRes(j,:) = dsResY;
+        j = j + 1;
+        xRes(j,:) = dsResX';
+    end
+\end{lstlisting}
+
+
+
+\section{Результаты}
+Ниже приведены графики результатов программ, описанных в прошлом пункте. На которых прямые -- соответсвующее значения  $y^s_{1}$, $y^s_{2}$.
+
+Результаты программной реализации алгоритма (\ref{Alg1}):
+\begin{figure}[bh]\centering{
+\includegraphics[width=150mm]{images/chap2.eps}
+}
+\end{figure}
+
+Результаты программной реализации алгоритма (\ref{Alg2}):
+\begin{figure}[bh]\centering{
+\includegraphics[width=150mm]{images/chap3.eps}}
+\end{figure}
+
+

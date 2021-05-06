@@ -1,0 +1,217 @@
+\chapter{Управление по прогнозирующей модели на основе данных: точные данные}\label{chap2}
+
+
+В данной главе будут рассматриваться способы построения простейшей прогнозирующей задачи на основе данных задачи с терминальными ограничениями-равенствами.
+
+\section{Основные предположения}\label{2sec:problem-formulation}
+
+Пусть $\mathbb{I}_{[a,b]}$ -- множество целых чисел на отрезке $[a,b]$.
+Для вектора $x$ и положительно определённой матрицы $P=P^T>0$ запишем $\|x\|_P=\sqrt{x^TPx}$.
+\newline
+Далее определим максимальное и минимальное собственные значения матрицы P
+$\lambda_{\min}(P)$ и $\lambda_{\max}(P)$.
+
+\indent Для матриц $P_1=P_1^T, P_2=P^T_2$ запишем, 	
+\begin{displaymath}
+	\lambda_{\min}(P_1,P_2)=\min\{\lambda_{\min}(P_1),\lambda_{\min}(P_2)\},
+\end{displaymath}
+\begin{displaymath}
+	\lambda_{\max}(P_1,P_2)=\max\{\lambda_{\max}(P_1),\lambda_{\max}(P_2)\}.
+\end{displaymath}
+ Также $\|x\|_2,\|x\|_1$, $\|x\|_\infty$ -- Евклидовы, $\ell_1$ и $\ell_\infty$ нормы $x$, соответственно.
+\newline
+Для $\delta > 0$, мы определим $\mathbb{B}_\delta=\{x \in \mathbb{R}^n \, | \, \|x\|_2 \leq\delta\}$.
+
+
+\indent Из последовательности $\{x_k\}^{N-1}_{k=0}$ составим матрицу Ганкеля
+\begin{displaymath}
+H_L(x)=
+\begin{bmatrix}
+	x_0 && x_1 && \dots && x_{N-L} \\
+	x_1 && x_2 && \dots && x_{N-L+1} \\
+	\vdots && && \ddots && \vdots \\
+	x_{L-1} && x_L && \dots && x_{N-1}
+\end{bmatrix},
+\end{displaymath}
+
+\begin{displaymath}
+x_{[a,b]}=
+\begin{bmatrix}
+	x_a \\ \vdots \\ x_b
+\end{bmatrix}
+\end{displaymath}
+
+\begin{Def}
+	$\{x_k\}_{k=0}^{N-1}$ с $x_k \in \mathbb{R}^n$ постоянно возбуждающая порядка L, если $\rank (H_L(x))=nL$.
+\end{Def}
+Цель паботы -- управление неизвестной линейной стационарной системой $G$ c порядком $n$, с $m$ входами и $p$ выходами. 
+
+\begin{Def}
+	 Последовательность $\{u_k,y_k\}^{N-1}_{k=0}$ -- траектория линейной стационарной системы $G$, если существуют начальное состояние $\overline{x} \in \mathbb{R}^n$, а также соответсвующая траектория $\{x_k\}^N_{k=0}$ такая, что 
+	 \begin{displaymath}
+	 	x_{k+1}=Ax_{k+1}+Bu_k; \; x_0=\overline{x},
+	 \end{displaymath}
+	 \begin{displaymath}
+	  	y_k=Cx_k+Du_k, \; k=0,\dots,N-1,
+	 \end{displaymath}
+	$(A,B,C,D)$ -- минимальные реализация $G$.
+\end{Def}
+
+\begin{theorem}\label{trajectoryTheorem}
+	Предположим, что $\{u^d_k,y^d_k\}^{N-1}_{k=0}$ -- траектория линейной стационарной системы $G$, где $u$ -- постоянно возбуждающее управление порядка $L+n$.
+\newline
+Тогда $\{\overline{u}_k,\overline{y}_k\}^{L-1}_{k=0}$ -- траектория $G$, тогда и только тогда, когда $\exists \alpha \in \mathbb{R}^{N-L+1}$ такое, что
+	\begin{equation}\label{formuleOfTrajectoryTheorem}
+		\begin{bmatrix}
+			H_L(u^d) \\
+			H_L(y^d)
+		\end{bmatrix} \alpha = 
+		\begin{bmatrix}
+			\overline{u} \\
+			\overline{y}
+		\end{bmatrix}.
+	\end{equation}
+\end{theorem}
+
+\begin{Def}\label{defTrajectory}
+Пара $(u^s,y^s) \in \mathbb{R}^{m+p}$ -- положение равновесия линейной стационарной системой $G$, если последовательность $\{\overline{u}_k,\overline{y}_k\}^{n-1}_{k=0}$ с $(\overline{u}_k,\overline{y}_k) = (u^s,y^s) \; \forall k \in \mathbb{I}{[0,n-1]} $ -- траектория $G$.
+\end{Def}
+
+	Для равновесия $(u^s,y^s)$ мы определим $u^s_n, y^s_n$ как столбец векторов содержащий $n$ раз $u^s$ и $y^s$, соответственно. Предположим, что система подчиняется ограничениям,
+$u_t \in \mathbb{U} \subseteq \mathbb{R}^m, y_t \in \mathbb{Y} \subseteq \mathbb{R}^p \; \forall t \geq 0$, и предположим, что $(u^s, y^s) \in int(\mathbb{U} \times \mathbb{Y})$. $\{u^d_k,y^d_k\}^{N-1}_{k=0}$ -- априори измеряемые траектории длинной $N$, использующиеся в (\ref{formuleOfTrajectoryTheorem}). Прогнозируемые входные и выходные траектории в момент времени $t$ в течение некоторого горизонта прогнозирования $L$ записываются как $\{\overline{u}_k(t),\overline{y}_k(t)\}^{L-1}_{k=-n}$.
+\parskip
+\parindent Обратим внимание, что индексы времени начинаются с $k=-n$, так как последние $n$ входов и выходов будут использоваться для вызова уникального начального состояния в момент времени $t$. Кроме того, вход с обратной связью, состояние в некоторой минимальной реализации и выход в момент времени $t$ обозначаются как $u_t,x_t, y_t$, соответственно.
+
+	
+\section{Простейшая прогнозирующая задача на основе данных}\label{2sec:xxx}
+	Теорема \ref{trajectoryTheorem} обеспечивает привлекательную альтернативу математической модели в пространстве состояний, так как (\ref{formuleOfTrajectoryTheorem}) достаточно, чтобы охватить все траектории системы. Таким образом, для реализации схемы MPC, основанной на данных, можно просто заменить динамику системы ограничением, которому удовлетворяют прогнозируемые траектории ввода-вывода (\ref{formuleOfTrajectoryTheorem}). Чтобы быть более точным, предложенная управляемая данными схема MPC решает задачу
+\begin{equation}\label{problem1a}
+		J_L(u_{[t-n,t-1]},y_{[t-n,t-1]},\alpha(t))=\sum^{L-1}_{k=0} \ell(\overline{u}_k(t),\overline{y}_k(t)),
+\end{equation}
+\begin{equation}\label{problem1b}
+	\begin{bmatrix}
+		\overline{u}_{[-n,-L-1]}(t) \\
+		\overline{y}_{[-n,-L-1]}(t)
+	\end{bmatrix} = 
+	\begin{bmatrix}
+		H_{L+n}(u^d) \\ 
+		H_{L+n}(y^d)
+	\end{bmatrix},	
+\end{equation}
+\begin{equation}\label{problem1c}
+	\begin{bmatrix}
+		\overline{u}_{[-n,-1]}(t) \\ 
+		\overline{y}_{[-n,-1]}(t) 
+	\end{bmatrix} = 
+	\begin{bmatrix}
+		u_{[t-n,t-1]} \\
+		y_{[t-n,t-1]}
+	\end{bmatrix},
+\end{equation}
+\begin{equation}\label{l}
+\ell(\overline{u},\overline{y})=\|\overline{u}-u^s\|_R^2+\|\overline{y}-y^s\|_Q^2, \: Q,R \succ 0.
+\end{equation}
+Ограничение (\ref{problem1b}) заменяет динамику системы по сравнению с классическими схемами MPC на основе моделей. Кроме того, (\ref{problem1c}) гарантирует, что внутреннее состояние истинной траектории совпадает с внутренним состоянием прогнозируемой траектории в момент времени $t$.
+Начальные траектории указываются до временного шага $t - 1$, поскольку входной сигнал в момент времени $t$ может уже влиять на выходной сигнал в момент времени $t$ в случае проходного элемента установки. Стоимость (\ref{problem1a}) зависит только от переменной оптимизации $\alpha(t)$, поскольку $\overline{u}(t)$ и $\overline{y}(t)$ неявно фиксируются через динамическое ограничение (\ref{problem1b}).
+
+\section{Задача с терминальными ограничениями-равенствами}\label{2sec:xxx}
+	В этом пункте рассмотрим простое терминальное ограничение, которое может быть включено непосредственно в структуру управления данными MPC.
+\begin{equation}\label{problem2a}
+		J^*_L(u_{[t-n,t-1]},y_{[t-n,t-1]}) = \underset{\substack{\alpha(t)\ \overline{u}(t),\overline{y}(t)}} \min \sum^{L-1}_{k=0}\ell(\overline{u}_k(t),\overline{y}_k(t))
+\end{equation}
+\begin{equation}\label{problem2b}
+	\begin{bmatrix}
+		\overline{u}_{[-n,-L-1]}(t) \\
+		\overline{y}_{[-n,-L-1]}(t)
+	\end{bmatrix} = 
+	\begin{bmatrix}
+		H_{L+n}(u^d) \\ 
+		H_{L+n}(y^d)
+	\end{bmatrix}\alpha(t),	
+\end{equation}
+\begin{equation}\label{problem2c}
+	\begin{bmatrix}
+		\overline{u}_{[-n,-1]}(t) \\ 
+		\overline{y}_{[-n,-1]}(t) 
+	\end{bmatrix} = 
+	\begin{bmatrix}
+		u_{[t-n,t-1]} \\
+		y_{[t-n,t-1]}
+	\end{bmatrix},
+\end{equation}
+\begin{equation}\label{problem2d}
+	\begin{bmatrix}
+		\overline{u}_{[L-n,L-1]}(t) \\ 
+		\overline{y}_{[L-n,L-1]}(t) 
+	\end{bmatrix} = 
+	\begin{bmatrix}
+		u_{n}^s \\
+		y_{n}^s
+	\end{bmatrix},
+\end{equation}
+\begin{equation}\label{problem2e}
+	\overline{u}_k(t) \in \mathbb{U}, \overline{y}_k(t) \in \mathbb{Y}, k \in \mathbb{I}_{[0,L-1]}.
+\end{equation}
+
+Терминальное ограничение-равенство (\ref{problem2d}) подразумевает, что $\overline{x}_L(t)$, который является внутренним состоянием, предсказанным на $L$ шагов вперед, соответствующей предсказанной траекторией, выравнивается с постоянным состоянием $x^s$, соответствующим $(u^s, y^s)$, то есть $\overline{x}_L(t)=x^s$ в любой минимальной реализации. В то время как задача требует, чтобы $(u^s, y^s)$ было равновесием неизвестной системы по определению (\ref{defTrajectory}), это требование может быть отброшено, когда $(u^s, y^s)$ заменено искусственным равновесием, которое также оптимизируется онлайн. Расширение представленной схемы MPC до такой настройки является предметом будущей работы. Как и в стандартном MPC, задача решена в виде отступающего горизонта, который обобщен в алгоритме (\ref{Alg1}).
+
+\newtheorem{algorithm}{Алгоритм}
+\begin{algorithm}\label{Alg1} (Схема управления на основе MPC)
+	\begin{enumerate}
+		\item В момент времени $t$ взять прошлые $n$ измерений $u_{[t-n,t-1]}, y_{[t-n,t-1]}$  и решить задачу.
+		\item Взять за управление $u_t=\overline{u}_0^*(t)$
+		\item Установить $t=t+1$ и вернуться к пункту 1).
+	\end{enumerate}
+\end{algorithm}
+
+
+\section{Асимптотическая устойчивость замкнутого контура}\label{2sec:xxx}
+Для анализа предположим, что $u^s = 0, y^s = 0$ и, следовательно, $x^s = 0$. Далее определим множество начальных состояний, для которых выполнимо (\ref{problem2a} -- \ref{problem2d}), $x_L=\{x\in\mathbb{R}^n | J^*_L(x) < \infty\}$. Для доказательства экспоненциальной устойчивости предложенной схемы предположим, что функция оптимальных значения (\ref{problem2a} -- \ref{problem2d}) квадратично ограничена сверху.
+
+\newtheorem{assump}{Предположение}
+\begin{assump}\label{assump1}
+	Функция оптимальных значения $J*_L(x)$ - квадратично ограничена сверху на $\mathbb{X_L}$, т.е. $\exists \, c_u>0$ такое, что $J^*_L(x)\leq c_u\|x\|_2^2 \forall x \in \mathbb{X}_L$
+\end{assump}
+
+\begin{theorem}
+	Пусть предположение (\ref{assump1}) верно, $L \geq, \{u^d_k,y^d_k\}^{N-1}_{k=0}$ -- траектория линейной стационарной системы $G$, где $u^d$ -- постоянно возбуждающий порядка $L+2n$.
+	Если задача MPC (\ref{problem2a} -- \ref{problem2d}) возможно в начальный момент времени $t=0$:
+	\begin{enumerate}
+		\item это возможно $\forall \: t$,
+		\item замкнутый цикл удовлетворяет ограничениям $u_t \in \mathbb{U}, y_t \in \mathbb{Y} \forall t \in \mathbb{N}$,
+		\item равновесие $x^s=0$ экспоненциально устойчиво для полученного замкнутого цикла.
+	\end{enumerate}
+\end{theorem}
+Доказательство (Экспоненциальная устойчивость)
+\newline
+Цена в момент времени t+1
+\begin{center}
+	$J_L(x_{t+1},\alpha'(t+1))=\sum^{L-1}_{k=0}\ell(\overline{u}_k'(t+1),\overline{y}_k'(t+1))=\sum^{L-1}_{k=0}\ell(\overline{u}^*_k(t),\overline{y}_k^*(t))=J^*_L(x_t)-\ell(\overline{u}_0^*(t),\overline{y}_0^*(t)).$
+\end{center}
+Откуда следует, что 
+\begin{equation}\label{J_L^*}
+	J_L^*(x_{t+1})\leq J^*_L(x_t)-\ell(\overline{u}_0^*(t),\overline{y}_0^*(t))
+\end{equation}
+
+Поскольку $х$ -- состояние наблюдаемой (и, следовательно, обнаруживаемой) минимальной реализации, существует матрица $P \succ 0$ такая, что $W(x)=\|x\|_P^2$ -- функция стабильности Ляпунова и удовлетворяет
+\begin{equation}\label{W(Ax+Bu)}
+	W(Ax+Bu)-W(x)\geq - \frac 1{2}\|x\|^2_2+c_1\|u\|^2_2+c_2\|y\|_2^2, c_1,c_2 > 0.
+\end{equation}
+где $\forall x \in \mathbb{R}^n, u \in \mathbb{R}^m, y=Cx+Du,$.
+Определим функцию Ляпунова
+$V(x)=\gamma W(x)+J^*_L(x)$ при некоторой $\gamma > 0.$ Т.к. $V$ квадратично ограничена снизу, $V(x) \geq \gamma W(x) \geq \gamma \lambda_{\min}(P)\|x\|^2_2 \quad \forall x \in \mathbb{X}_L$.
+По предположению (\ref{assump1}) $J_L^*$ квадратично ограничена сверху, т.е. $J^*_L(x) \leq c_u\|x\|_2^2 \quad \forall x \in \mathbb{X}_L$.
+\begin{displaymath}
+	V(x)=J*_L(x)+ \gamma W(x) \leq (c_u+\gamma \lambda_{\max}(P))\|x\|_2^2 \quad \forall x \in \mathbb{X}_L,
+\end{displaymath}
+т.е. $V$ - квадратично ограничена сверху.
+\newline
+Вдоль траекторий с замкнутым контуром, используя (\ref{J_L^*}) и (\ref{W(Ax+Bu)}), получим
+\begin{center}
+	$V(x_{t+1})-V(x_t)\leq \gamma(-\frac 1{2} \|x_t\|^2_2+ c_1\|u_t\|^2_2+c_2\|y_t\|^2_2)-\|u_t\|^2_R-\|y_t\|^2_Q \leq -\frac \gamma{2}\|x_t\|^2_2$
+\end{center}
+Таким образом, $V$ затухает экспоненциально вдоль траекторий замкнутого контура, он квадратично ограничен сверху и снизу и удовлетворяет условию $V(0) = 0$. Следовательно, из стандартных аргументов Ляпунова следует, что равновесие $x^s = 0$ экспоненциально устойчиво.
+
+\parskip
+\parindent Было показано, что замкнутый контур в n-ступенчатой схеме управления по прогнозирующей модели рекурсивно выполним и практически экспоненциально стабилен, следовательно, он является и асимптотически устойчивым.
+
