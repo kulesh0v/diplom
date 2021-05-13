@@ -154,13 +154,12 @@ for t = 0:n:N
                            'TolFun', 1e-15, ...
                            'TolX', 1e-15);
     [res, value] = quadprog(quadH, quadF, [], [], ...
-                            Aeq, beq, [], [], [], options);    
+                            Aeq, beq, [], [], [], options);
+    disp(res)
     res = res(1:(L + n) * 4);
     j = timeIndex - n;
     for i = 1:4:(L + n) * 4
         uRes(j, 1) = res(i);
-        uRes(j, 2) = res(i + 1);
-        disp(xRes(j,:));
         [dsResY, dsResX] = dynamicSystemFunc(uRes(j,:)', xRes(j,:)', A, B, C);
         yRes(j,:) = dsResY + rand(2,1) * epsilon;
         j = j + 1;
