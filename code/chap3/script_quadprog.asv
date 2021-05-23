@@ -31,7 +31,7 @@ coeffR = 10^-4;
 coeffQ = 3;
 lambdaSigma=1000;
 lambdaAlphaEps=0.1;
-epsilon=0.01;
+epsilon=0.005;
 R = 10^-4 * eye(2);
 Q = 3 * eye(2);
 normValue = @(x, matrix) sqrt(x * matrix * x');
@@ -57,7 +57,13 @@ end
 
 uRes = zeros(N + n + L, 2);
 yRes = zeros(N + n + L, 2);
-xRes = ones(N + n + L, 4);
+xRes = zeros(N + n + L, 4);
+
+for i = 1:N
+    uRes([i * 2 - 1 i * 2]) = [ - 1 + 2 / N * (i - 1)];
+    yRes([i * 2 - 1 i * 2]) = [(C * curX)];
+    
+end
 
 steadyFirstIndex = (L + n) * 4 + (N - (L + n) + 1) + 1;
 
