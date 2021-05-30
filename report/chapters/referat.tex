@@ -1,39 +1,68 @@
+\chapter*{ПЕРЕЧЕНЬ УСЛОВНЫХ ОБОЗНАЧЕНИЙ}
+\addcontentsline {toc}{chapter}{ПЕРЕЧЕНЬ УСЛОВНЫХ ОБОЗНАЧЕНИЙ}
+
+$\mathbb{I}_{[a,b]}$ -- множество целых чисел на отрезке $[a,b]$.
+
+Для вектора $x$ и положительно определённой матрицы $P=P^T>0$ запишем $\|x\|_P=\sqrt{x^TPx}$.
+
+$
+H_L(x)=
+\begin{bmatrix}
+	x_0 && x_1 && \dots && x_{N-L} \\
+	x_1 && x_2 && \dots && x_{N-L+1} \\
+	\vdots && && \ddots && \vdots \\
+	x_{L-1} && x_L && \dots && x_{N-1}
+\end{bmatrix}
+$ --  матрица Ганкеля, составленная из последовательности $\{x_k\}^{N-1}_{k=0}$  
+
+
+Определим максимальное и минимальное собственные значения матрицы P
+$\lambda_{\min}(P)$ и $\lambda_{\max}(P)$. Для матриц $P_1=P_1^T, P_2=P^T_2$ запишем, 	
+\begin{displaymath}
+	\lambda_{\min}(P_1,P_2)=\min\{\lambda_{\min}(P_1),\lambda_{\min}(P_2)\},
+\end{displaymath}
+\begin{displaymath}
+	\lambda_{\max}(P_1,P_2)=\max\{\lambda_{\max}(P_1),\lambda_{\max}(P_2)\}.
+\end{displaymath}
+
+ $\|x\|_2,\|x\|_1$, $\|x\|_\infty$ -- Евклидовы, $\ell_1$ и $\ell_\infty$ нормы $x$, соответственно.
+
 \chapter*{РЕФЕРАТ}
 \addcontentsline{toc}{chapter}{РЕФЕРАТ}
 
-Дипломная работа, \pageref{lastpage}~с., 3 рис., 5 ист.
+Дипломная работа, \pageref{lastpage}~с., 5 рис., 5 ист.
 
 \bigskip
 
-\noindent ОПТИМАЛЬНОЕ УПРАВЛЕНИЕ, УПРАВЛЕНИЕ ПО ПРОГНОЗИРУЮЩЕЙ МОДЕЛИ, МАТРИЦА ГАНКЕЛЯ.
+\noindent ОПТИМАЛЬНОЕ УПРАВЛЕНИЕ, УПРАВЛЕНИЕ ПО ПРОГНОЗИРУЮЩЕЙ МОДЕЛИ, ЛИНЕЙНАЯ СИСТЕМА, МАТРИЦА ГАНКЕЛЯ.
 
 
 \bigskip
 
-Объектом исследования дипломной работы являются линейные системы и связанные с ними задачи оптимального управления.
+Объектом исследования дипломной работы являются линейные стационарные системы, для которых неизвестны их математические модели в пространстве состояний, однако даны априорные траектории входных и выходных переменных, на основе которых требуется строить обратные связи, обеспечивающие стабилизацию рассматриваемой системы.
 
-Цель работы -- построение численного метода для эффективного решения задачи оптимального управления по прогнозирующей модели для линейных систем.
+Целью работы является реализация методов управления по прогнозирующей модели  для стабилизации исследуемой линейной стационарной системы на основе доступных априорных данных, как точных, так и содержащих шум во входных переменных.
 
 Основные методы исследования -- методы оптимизации, теории систем.
 
-Результатом данной работы является алгоритм решения задачи оптимального управления по прогнозирующей модели для линейных систем.
+Результатом данной работы является алгоритм решения задачи оптимального управления по прогнозирующей модели для линейных стационарных систем.
 
 \newpage
 
 \section*{\centerline{РЭФЕРАТ}}
 
 
-Дыпломная работа, \pageref{lastpage}~с., 3 рис., 5 кр.
+Дыпломная работа, \pageref{lastpage}~с., 5 рис., 5 кр.
 
 \bigskip
 
-\noindent АПТЫМАЛЬНАЕ КІРАВАННЕ, КІРАВАННЕ ПА ПРАГНАЗУЮЦЬ МАДЭЛІ, МАТРЫЦА ХАНКЕЛЯ.
+\noindent АПТЫМАЛЬНАЕ КІРАВАННЕ, КІРАВАННЕ ПА ПРАГНАЗУЮЦЬ МАДЭЛІ, ЛІНЕЙНАЯ СІСТЭМА, МАТРЫЦА ХАНКЕЛЯ.
 
 \bigskip
 
-Аб'ектам даследавання дыпломнай працы з'яўляюцца лінейныя сістэмы і звязаныя з імі задачы аптымальнага кіравання.
+Аб'ектам даследавання дыпломнай працы з'яўляюцца лінейныя стацыянарныя сістэмы, для якіх невядомыя іх матэматычныя мадэлі ў прасторы станаў, аднак дадзены апрыёрныя траекторыі ўваходных і выходных зменных, на аснове якіх патрабуецца будаваць зваротныя сувязі, якія забяспечваюць стабілізацыю разгляданай сістэмы.
 
-Мэта працы -- пабудова колькаснага метаду для эфектыўнага вырашэння задачы аптымальнага кіравання па прагназуючай мадэлі для лінейных сістэм.
+Мэтай працы з'яўляецца рэалізацыя метадаў кіравання па прагназуюць мадэлі для стабілізацыі доследнай лінейнай стацыянарнай сістэмы на аснове даступных апрыёрных дадзеных, як дакладных, так і якія змяшчаюць шум у ўваходных зменных.
 
 Асноўныя метады даследавання -- метады аптымізацыі, тэорыі сістэм.
 
@@ -45,15 +74,15 @@
 
 \bigskip
 
-Degree thesis, \pageref{lastpage}~pages, 3 pictures, 5 sources
+Degree thesis, \pageref{lastpage}~pages, 5 pictures, 5 sources
 
-\noindent OPTIMAL CONTROL, MODEL PREDICTIVE CONTROL, HANKEL MATRIX.
+\noindent OPTIMAL CONTROL, MODEL PREDICTIVE CONTROL, LINEAR SYSTEM, HANKEL MATRIX.
 
 \bigskip
 
-The research object of the thesis is linear systems and related optimal control problems.
+The research object of the thesis is linear stationary systems, for which their mathematical models in the state space are unknown, but a priori trajectories of input and output variables are given, on the basis of which it is required to build feedbacks that ensure the stabilization of the system under consideration.
 
-The aim of the work is to construct a numerical method for efficiently solving the problem of optimal control using a predictive model for linear systems.
+The aim of the work is to implement control methods using a predictive model to stabilize the investigated linear stationary system based on available a priori data, both accurate and containing noise in the input variables.
 
 The main research methods are optimization methods, systems theory.
 
