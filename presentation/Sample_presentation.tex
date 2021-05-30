@@ -1,0 +1,293 @@
+\documentclass[notheorems]{beamer}
+\usepackage[cp1251]{inputenc}
+\usepackage{SlideStyle}
+
+\titlegraphic{\vspace*{-7cm}
+    \parbox[c]{3cm}{\includegraphics[height=.7cm]{bsulogo}}
+    \hspace*{1cm}%
+    \parbox[c]{2cm}{\includegraphics[height=1.5cm]{FPMIlogo}}
+    \hspace*{1cm}%
+    \parbox[c]{3cm}{\includegraphics[height=.7cm]{MOUlogo}}
+    \vspace*{3cm}
+}
+
+
+\begin{document}
+
+\title[MPC]{\Large УПРАВЛЕНИЕ ПО ПРОГНОЗИРУЮЩЕЙ МОДЕЛИ НА ОСНОВЕ ДАННЫХ ДЛЯ ЛИНЕЙНЫХ СИСТЕМ}
+
+
+\author[В.В. Кулешов]{Кулешов Владислав Вячеславович}
+
+
+
+
+\institute[ФПМИ, БГУ]{}	
+
+
+\date[\copyright 31.05.2021]{}%{\scriptsize \structure{2017-2018}}
+
+\maketitle
+
+\newtheorem{Def}{Определение}
+%--------------------------------------------------------------------------
+\begin{frame}{Цель работы}
+Объектом исследования дипломной работы являются линейные стационарные системы, для которых неизвестны их математические модели в пространстве состояний, однако даны априорные траектории входных и выходных переменных, на основе которых требуется строить обратные связи, обеспечивающие стабилизацию рассматриваемой системы.
+\bigskip
+
+Целью работы является реализация методов управления по прогнозирующей модели  для стабилизации исследуемой линейной стационарной системы на основе доступных априорных данных, как точных, так и содержащих шум во входных переменных.
+\end{frame}
+%--------------------------------------------------------------------------
+\begin{frame}{Постановка задачи}
+Рассмотрим линейную стационарную систему $G$ вида:
+	 \begin{displaymath}
+	 	x_{k+1}=Ax_{k}+Bu_k; \; x_0=\overline{x},
+	 \end{displaymath}
+	 \begin{displaymath}
+	  	y_k=Cx_k+Du_k, \; k=0,\dots,N-1,
+	 \end{displaymath}
+где $(A,B,C,D)$ -- минимальная реализация $G$; 
+\newline
+	$x=x(t) \in \mathbb{R}^n$ -- состояние системы в момент времени $t$;\newline
+	$u=u(t) \in \mathbb{R}^r$ -- значение управляющего воздействия в момент времени $t$;\newline
+	$y=y(t) \in \mathbb{R}^p$ -- выходной сигнал.
+
+\end{frame}
+
+\begin{frame}
+
+\begin{Def}
+	 Последовательность $\{u_k,y_k\}^{N-1}_{k=0}$ -- траектория линейной стационарной системы $G$, если существуют начальное состояние $\overline{x} \in \mathbb{R}^n$, а также соответсвующая траектория $\{x_k\}^N_{k=0}$ такая, что 
+	 \begin{displaymath}
+	 	x_{k+1}=Ax_{k}+Bu_k; \; x_0=\overline{x},
+	 \end{displaymath}
+	 \begin{displaymath}
+	  	y_k=Cx_k+Du_k, \; k=0,\dots,N-1,
+	 \end{displaymath}
+	$(A,B,C,D)$ -- минимальные реализация $G$.
+\end{Def}
+
+\begin{Def}
+	$\{u_k\}_{k=0}^{N-1}$ с $u_k \in \mathbb{R}^r$ постоянно возбуждающая порядка $L$, если $\rank (H_L(x))=nL$.
+\end{Def}
+\end{frame}
+
+%--------------------------------------------------------------------------
+\begin{frame}{Теорема}
+
+\begin{theorem}\label{trajectoryTheorem}
+	Предположим, что $\{u^d_k,y^d_k\}^{N-1}_{k=0}$ -- траектория линейной стационарной системы $G$, где $u$ -- постоянно возбуждающее управление порядка $L$, т.е. $rank(H_{L}(u)) = nL$.
+\newline
+Тогда $\{\overline{u}_k,\overline{y}_k\}^{L-1}_{k=0}$ -- траектория $G$, тогда и только тогда, когда $\exists \alpha \in \mathbb{R}^{N-L+1}$ такое, что
+	\begin{equation}\label{formuleOfTrajectoryTheorem}
+		\begin{bmatrix}
+			H_L(u^d) \\
+			H_L(y^d)
+		\end{bmatrix} \alpha = 
+		\begin{bmatrix}
+			\overline{u} \\
+			\overline{y}
+		\end{bmatrix}.
+	\end{equation}
+\end{theorem}
+
+\end{frame}
+
+%--------------------------------------------------------------------------
+\begin{frame}{Задача с терминальными ограничениями}
+\begin{equation}\label{problem2a}
+		J^*_L(u_{[t-n,t-1]},y_{[t-n,t-1]}) = \underset{\substack{\alpha(t)\ \overline{u}(t),\overline{y}(t)}} \min \sum^{L-1}_{k=0}\ell(\overline{u}_k(t),\overline{y}_k(t))
+\end{equation}
+\begin{equation}\label{problem2b}
+	\begin{bmatrix}
+		\overline{u}_{[-n,-L-1]}(t) \\
+		\overline{y}_{[-n,-L-1]}(t)
+	\end{bmatrix} = 
+	\begin{bmatrix}
+		H_{L+n}(u^d) \\ 
+		H_{L+n}(y^d)
+	\end{bmatrix}\alpha(t),	
+\end{equation}
+\begin{equation}\label{problem2c}
+	\begin{bmatrix}
+		\overline{u}_{[-n,-1]}(t) \\ 
+		\overline{y}_{[-n,-1]}(t) 
+	\end{bmatrix} = 
+	\begin{bmatrix}
+		u_{[t-n,t-1]} \\
+		y_{[t-n,t-1]}
+	\end{bmatrix},
+\end{equation}
+\begin{equation}\label{problem2d}
+	\begin{bmatrix}
+		\overline{u}_{[L-n,L-1]}(t) \\ 
+		\overline{y}_{[L-n,L-1]}(t) 
+	\end{bmatrix} = 
+	\begin{bmatrix}
+		u_{n}^s \\
+		y_{n}^s
+	\end{bmatrix},
+\end{equation}
+\begin{equation}\label{l}
+\ell(\overline{u},\overline{y})=\|\overline{u}-u^s\|_R^2+\|\overline{y}-y^s\|_Q^2, \: Q,R \succ 0.
+\end{equation}
+\begin{equation}
+	\overline{u}_k(t) \in \mathbb{U}, \overline{y}_k(t) \in \mathbb{Y}, k \in \mathbb{I}_{[0,L-1]}.
+\end{equation}
+\end{frame}
+%--------------------------------------------------------------------------
+\begin{frame}{Алгоритм 1}
+\newtheorem{algorithm}{Алгоритм}
+\begin{algorithm}\label{Alg1} (Схема управления на основе MPC)
+	\begin{enumerate}
+		\item В момент времени $t$ взять прошлые $n$ измерений $[u_{[t-n,t-1]}, y_{[t-n,t-1]}]$  и решить задачу (\ref{problem2a})-(\ref{problem2d}).
+		\item Взять за управление $u_t=\overline{u}_0^*(t)$
+		\item Установить $t=t+1$ и вернуться к пункту 1).
+	\end{enumerate}
+\end{algorithm}
+\end{frame}
+%--------------------------------------------------------------------------
+\begin{frame}{Неточные данные}
+\begin{displaymath}
+ \widetilde{y}^d_k=y^d_k+\varepsilon^d_k;
+\end{displaymath}
+\begin{displaymath}
+ \widetilde{y}_k=y_k+\varepsilon_k;
+\end{displaymath}
+\begin{displaymath}
+\|\varepsilon^d_k\|_\infty\leq \overline{\varepsilon}
+\end{displaymath}
+
+
+
+\end{frame}
+
+%--------------------------------------------------------------------------
+\begin{frame}{Задача с терминальными ограничениями}
+\begin{multline}\label{problem3a}
+		J^*_L(u_{[t-n,t-1]},\widetilde{y}_{[t-n,t-1]}) = \underset{\substack{\alpha(t),\overline{u}(t),\overline{y}(t), \sigma(t)}} \min \sum^{L-1}_{k=0}\ell(\overline{u}_k(t),\overline{y}_k(t)) + \\ + \lambda_\alpha \overline{\varepsilon}\|\alpha(t)\|^2_2 + \lambda_\sigma \|\sigma(t)\|^2_2
+\end{multline}
+\begin{equation}\label{problem3b}
+	\begin{bmatrix}
+		\overline{u}(t)\\
+		\overline{y}(t) + \sigma(t)
+	\end{bmatrix} = 
+	\begin{bmatrix}
+		H_{L+n}(u^d) \\ 
+		H_{L+n}(\widetilde{y}^d)
+	\end{bmatrix}\alpha(t),	
+\end{equation}
+\begin{equation}\label{problem3c}
+	\begin{bmatrix}
+		\overline{u}_{[-n,-1]}(t) \\ 
+		\overline{y}_{[-n,-1]}(t) 
+	\end{bmatrix} = 
+	\begin{bmatrix}
+		u_{[t-n,t-1]} \\
+		y_{[t-n,t-1]}
+	\end{bmatrix},
+\end{equation}
+\begin{equation}\label{problem3d}
+	\begin{bmatrix}
+		\overline{u}_{[L-n,L-1]}(t) \\ 
+		\overline{y}_{[L-n,L-1]}(t) 
+	\end{bmatrix} = 
+	\begin{bmatrix}
+		u_{n}^s \\
+		y_{n}^s
+	\end{bmatrix}, \overline{u}_k \in \mathbb{U},
+\end{equation}
+\begin{equation}\label{problem3e}
+	\|\sigma_k(t)\|_\infty \leq \overline{\varepsilon}(1+ \| \alpha(t) \|_1), k \in \mathbb{I}_{[0,L-1]}.
+\end{equation}
+\end{frame}
+
+%--------------------------------------------------------------------------
+\begin{frame}{Пример}
+\begin{figure}[!h]\centering{
+\includegraphics[width=80mm]{images/four-tank-system_rus.png}}\label{fourtank}
+\caption{Схема системы из четырёх сообщающихся резервуаров}
+\end{figure}
+\end{frame}
+\begin{frame}{Пример}
+
+\begin{displaymath}
+	x_{k+1}=\begin{bmatrix}
+		0.921 && 0 && 0.041 && 0 \\
+		0 && 0.918 && 0 && 0.033 \\
+		0 && 0 && 0.924 && 0 \\
+		0 && 0 && 0 && 0.937
+	\end{bmatrix}x_k+
+	\begin{bmatrix}
+		0.017 && 0.001 \\
+		0.001 && 0.023 \\
+		0 && 0.061 \\
+		0.072 && 0
+	\end{bmatrix}u_k,
+\end{displaymath}
+\begin{displaymath}
+	y_k=\begin{bmatrix}
+		1 && 0 && 0 && 0\\
+		0 && 1 && 0 && 0
+	\end{bmatrix}x_k.
+\end{displaymath}
+
+\begin{displaymath}
+	(u^s,y^s)=(
+		\begin{bmatrix}
+			1 \\ 1
+		\end{bmatrix},	
+		\begin{bmatrix}
+		   0.65 \\ 0.77
+		\end{bmatrix}		
+	).
+\end{displaymath}
+
+Предположим, что системные матрицы неизвестны, но доступна одна траектория $\{u^d_k,y^d_k\}^{N-1}_{k=0}$ длины $N$ = 400, которая генерируется путем равномерной выборки $u^d_k$ из $[-1,1]^2$.
+Горизонт прогнозирования установим в $L = 30$, и следующие параметры $Q = 3 \cdot E_2$, $R = 10^{-4} \cdot E_2, \lambda_\sigma = 1000, \lambda_\alpha\overline{\varepsilon}=0.1$.
+
+\end{frame}
+%--------------------------------------------------------------------------
+\begin{frame}{Результаты}
+\begin{figure}[h]\centering{
+\includegraphics[width=80mm]{images/chap2.eps}
+\caption{Результаты программной реализации схемы с точными данными, при начальном состоянии $x_0=(0,0,0,0)^T$}
+\label{ch2-ris}}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Результаты}
+\begin{figure}[]\centering{
+\includegraphics[width=80mm]{images/chap2_1.eps}
+\caption{Результаты программной реализации схемы с точными данными, при начальном состоянии $x_0=(1,1,1,1)^T$}
+\label{ch2_1}}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Результаты}
+\begin{figure}[]\centering{
+\includegraphics[width=80mm]{images/chap3.eps}}
+\caption{Результаты программной реализации схемы с неточными данными, при начальном состоянии $x_0=(0,0,0,0)^T$.
+\label{ch3}}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Результаты}
+\begin{figure}[]\centering{
+\includegraphics[width=80mm]{images/chap3_1eps.eps}}
+\caption{Результаты программной реализации схемы с неточными данными, при начальном состоянии $x_0=(1,1,1,1)^T$.
+\label{ch3_1}}
+\end{figure}
+\end{frame}
+
+%--------------------------------------------------------------------------
+\begin{frame}{Концовка}
+\begin{center}
+	Спасибо за внимание!
+\end{center} 
+
+\end{frame}
+
+\end{document} 
+
+\end{document} 
